@@ -1,2 +1,5 @@
 # docker_cicd_ansible
-Déploiment sécurisé et automatisé d'une application web
+
+Pipeline CICD pour la conteneurisation et l'orchestration du déploiment de l'application streamlit.
+
+## Projet en cours de developpement
