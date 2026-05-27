@@ -4,7 +4,7 @@ stages:
   - deploy
 
 variables:
-  IMAGE_NAME: "docker.io/marco24561/app2"
+  IMAGE_NAME: "docker.io/${REGISTRY_USER}/app2"
   STORAGE_DRIVER: "vfs"
   BUILDAH_ISOLATION: "chroot"
   BUILDAH_FORMAT: "docker"
