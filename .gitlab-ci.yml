@@ -1,0 +1,45 @@
+stages:
+  - test
+  - build
+  - deploy
+
+variables:
+  IMAGE_NAME: "docker.io/marco24561/app2"
+  STORAGE_DRIVER: "vfs"
+  BUILDAH_ISOLATION: "chroot"
+  BUILDAH_FORMAT: "docker"
+  IMAGE_TAG: "V1.2"
+
+test_stage:
+  stage: test
+  image: alpine:3.22
+  script:
+
+    - |
+      if [ -d "$CI_PROJECT_DIR"]; then
+         echo "le dossier $CI_PROJECT_DIR existe"
+      else 
+          echo "le dossier $CI_PROJECT_DIR n'existe pas"
+      fi
+
+buid_stage:
+  stage: build 
+  image: quay.io/buildah/stable:v1.43.1-immutable
+  rules:
+    - if: $CI_COMMIT_TAG && $CI_COMMIT_REF_PROTECTED == "true"
+      when: on_success
+  
+  before_script:
+    - buildah login -u "${REGISTRY_USER}" -p "${REGISTRY_TOKEN_HUB}" docker.io
+  script:
+    - buildah bud -t "${IMAGE_NAME}:${IMAGE_TAG}-${CI_COMMIT_SHORT_SHA}" .
+    - buildah push "${IMAGE_NAME}:${IMAGE_TAG}-${CI_COMMIT_SHORT_SHA}"
+ 
+  after_script:
+    - docker images
+
+deploy_stage:
+  stage: deploy
+
+
+## En cours de developpement
