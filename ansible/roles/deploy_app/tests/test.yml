@@ -1,0 +1,7 @@
+---
+- hosts: localhost
+  remote_user: root
+  roles:
+    - deploy_app
+
+## test with your own file and inventory, this is a just an automatic build file
