@@ -1,1 +1,11 @@
-# Eléments à renseigner
+# Key elements to execute ansble playbook
+
+---
+- name: app deployment
+  hosts: workers
+  gather_facts: no
+  become: true 
+
+  roles:
+    - deploy_app
+
