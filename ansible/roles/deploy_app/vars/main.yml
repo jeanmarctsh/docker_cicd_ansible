@@ -1,0 +1,3 @@
+---
+# vars file for deploy_app
+deploy_app_name: streamlit
