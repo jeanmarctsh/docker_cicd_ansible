@@ -1,0 +1,36 @@
+---
+# tasks file for deploy_app
+
+- name: update cache
+  ansible.builtin.apt:
+    update_cache: yes
+    when: ansible_os_family == "Debian"
+    tags: always
+
+
+- name: Connexion to private registry
+  community.docker.docker_login:
+    registry_url: https://index.docker.io/v1/
+    username: "{{ lookup('ansible.builtin.env', 'REGISTRY_USER') }}"
+    password: "{{ lookup('ansible.builtin.env', 'REGISTRY_TOKEN_HUB') }}"
+  no_log: true
+
+
+- name: app folder directory create
+  ansible.builtin.file:
+    path: /opt/streamlit_app
+    state: directory
+    owner: root
+    group: root
+    mode: 0700
+
+- name: set up templates env
+  ansible.builtin.template:
+    src: .env.j2
+    dest: /opt/streamlit_app/.env
+    owner: root 
+    group: root 
+  notify:
+
+- name: deploy app from privae repository
+  
