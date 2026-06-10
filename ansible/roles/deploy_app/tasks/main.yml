@@ -4,8 +4,8 @@
 - name: update cache
   ansible.builtin.apt:
     update_cache: yes
-    when: ansible_os_family == "Debian"
-    tags: always
+  when: ansible_os_family == "Debian"
+  tags: always
 
 
 - name: Connexion to private registry
@@ -20,17 +20,18 @@
   ansible.builtin.file:
     path: /opt/streamlit_app
     state: directory
-    owner: root
-    group: root
-    mode: 0700
+    owner: "{{user_owner}}"
+    group: "{{user_group}}"
+    mode: '0755'
 
 - name: set up templates env
   ansible.builtin.template:
     src: .env.j2
-    dest: /opt/streamlit_app/.env
-    owner: root 
-    group: root 
-  notify:
+    dest: /opt/streamlit_app/.env  ## still in progress
+    owner: "{{user_owner}}"
+    group: "{{user_group}}"
+  notify: ## add once it'll be done
 
-- name: deploy app from privae repository
+- name: deploy app from private repository
+  
   
