@@ -1,4 +1,4 @@
-# Key elements to execute ansble playbook
+# Key elements to execute ansble playbook (file to execute on CICD). 
 
 ---
 - name: app deployment
