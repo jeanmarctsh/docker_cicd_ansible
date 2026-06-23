@@ -11,22 +11,20 @@ variables:
   # Tag will be fetch automatically once create, even for a simple update(first thing to do once everything ok)
   IMAGE_TAG: $CI_COMMIT_TAG
 
-# Checking repository
+# Environment and File Checking
 test_stage:
   stage: test
-  image: alpine:3.23.4
+  image: python:3.13-slim
   script:
-      # Checking if the directory exist
-    - |
-      if [ -d "$CI_PROJECT_DIR" ]; then
-         echo "le dossier $CI_PROJECT_DIR existe"
-      else 
-          echo "le dossier $CI_PROJECT_DIR n'existe pas"
-      fi
+    - pip install --no-cache-dir --upgrade pip
+    - pip install --no-cache-dir streamlit pillow pandas mysql-connector-python
+    - python -m py_compile ./Hotel-Management-using-SQL-main/app/Main_Page.py
+    
 
 # Steps required to create and push image to private registry
 build_stage:
   stage: build 
+  needs: ["test_stage"]
   # fixed image for more control during the whole process
   image: quay.io/buildah/stable:v1.43.1-immutable
   rules:
