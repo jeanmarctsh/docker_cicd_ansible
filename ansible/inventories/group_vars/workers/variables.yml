@@ -1,0 +1,5 @@
+---
+
+DB_NAME=value here
+DB_USER=value here
+DB_HOST=mysql
