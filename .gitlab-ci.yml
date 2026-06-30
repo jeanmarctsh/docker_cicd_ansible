@@ -1,6 +1,7 @@
 stages:
   - test
   - build
+  - scan
   - deploy
 
 variables:
@@ -16,9 +17,12 @@ test_stage:
   stage: test
   image: python:3.13-slim
   script:
+      # Upgrade pip package manager
     - pip install --no-cache-dir --upgrade pip
+      # Install project dependencies
     - pip install --no-cache-dir streamlit pillow pandas mysql-connector-python
-    - python -m py_compile ./Hotel-Management-using-SQL-main/app/Main_Page.py
+      # syntax checking with "py_compile"
+    - python -m py_compile ./Hotel-Management-using-SQL-main/app/Main_Page.py 
     
 
 # Steps required to create and push image to private registry
@@ -32,7 +36,7 @@ build_stage:
       when: on_success
   
   before_script:
-      # Connexion to private docker registry
+      # login to private registry
     - buildah login -u "${REGISTRY_USER}" -p "${REGISTRY_TOKEN_HUB}" docker.io
   script:
       # Create an image
@@ -42,6 +46,35 @@ build_stage:
       # list images 
   after_script:
     - buildah images
+
+
+# Scan the built image with Trivy
+scan_stage:
+  stage: scan
+  needs: ["build_stage"]
+  image: 
+    name: aquasec/trivy:0.72.0          
+    entrypoint: [""]  
+  
+  before_script:
+
+    - trivy image --format json --output image-scan-report.json "docker.io/${IMAGE_NAME}:${IMAGE_TAG}"
+
+    # login to private registry
+    - trivy registry login -u "${REGISTRY_USER}" -p "${REGISTRY_TOKEN_HUB}" docker.io
+
+  script:
+    # Scan the built image with Trivy (Fails code 1 only on CRITICAL vulnerabilities)
+    - trivy image --exit-code 1 --severity CRITICAL "docker.io/${IMAGE_NAME}:${IMAGE_TAG}"
+  
+  artifacts:
+    name:   "result-${IMAGE_TAG}"
+    when: always                        
+    paths:
+      - image-scan-report.json
+    expire_in: 1 week
+
+
 
 # Steps required to pull image from private repository and deploy app on workers nodes with ansible
 deploy_stage:
