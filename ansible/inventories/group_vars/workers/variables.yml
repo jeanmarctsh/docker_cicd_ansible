@@ -3,3 +3,5 @@
 DB_NAME=value here
 DB_USER=value here
 DB_HOST=mysql
+MYSQL_USER=value here
+deploy_app_port=value here
