@@ -31,7 +31,7 @@ services:
     env_file:
       - .env.db
     healthcheck:
-       test: ["CMD-SHELL", "mysqladmin", "ping", "-h", "localhost", "-u", "$${{ MYSQL_USER }}", "-p$${{ MYSQL_PASSWORD }}"]
+       test: ["CMD-SHELL", "mysqladmin ping -h localhost -u {{ MYSQL_USER }} -p{{ MYSQL_PASSWORD }}"]
       interval: 30s
       timeout: 30s
       retries: 5
@@ -41,20 +41,20 @@ services:
   phpmyadmin:
     image: phpmyadmin:5.2.3
     container_name: phpmyadmin
-    ports:
+    ports: 
       - "{{ phpmyadmin_port }}:80"
     networks:
       - back
     depends_on:
       mysql:
         condition: service_healthy
-        ## à refaire une fois connect sur la vm linux pour faciliter une jonction commune
+        ## à refaire une fois connecté sur la vm linux pour faciliter une jonction commune
     environment:
       - PMA_ARBITRARY=1
-      - PMA_HOST={{ DB_HOST }}
-      - PMA_USER={{ DB_USER }}
-      - PMA_PASSWORD={{ MYSQL_PASSWORD }}
-      - PMA_PORT={{ MYSQL_PORT }}
+      - PMA_HOST: {{ DB_HOST }}
+      - PMA_USER: {{ DB_USER }}
+      - PMA_PASSWORD: {{ MYSQL_PASSWORD }}
+      - PMA_PORT: {{ MYSQL_PORT }}
 
 volumes:
   bdd_data:
