@@ -3,3 +3,4 @@
 deploy_app_port: 8501
 user_owner: rua
 user_group: "{{user_owner}}"
+working_path: /opt/streamlit_app/
