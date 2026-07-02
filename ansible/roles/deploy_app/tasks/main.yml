@@ -17,7 +17,7 @@
 
 - name: app folder directory create
   ansible.builtin.file:
-    path: /opt/streamlit_app
+    path: "{{ working_path }}"
     state: directory
     owner: "{{user_owner}}"
     group: "{{user_group}}"
@@ -26,14 +26,14 @@
 - name: Generate docker-compose file
   ansible.builtin.template:
     src: docker-compose.yml.j2
-    dest: /opt/streamlit_app/docker-compose.yml
+    dest: "{{ working_path }}/docker-compose.yml"
     owner: "{{user_owner}}"
     group: "{{user_group}}"
 
 - name: set up templates .env.app
   ansible.builtin.template:
     src: env.app.j2
-    dest: /opt/streamlit_app/.env.app  ## still in progress
+    dest: "{{ working_path }}/.env.app"  ## still in progress
     owner: "{{user_owner}}"
     group: "{{user_group}}"
     mode: '0600'
@@ -42,7 +42,7 @@
 - name: set up templates .env.db
   ansible.builtin.template:
     src: env.db.j2
-    dest: /opt/streamlit_app/.env.db  ## still in progress
+    dest: "{{ working_path }}/.env.db"  ## still in progress
     owner: "{{user_owner}}"
     group: "{{user_group}}"
     mode: '0600'
