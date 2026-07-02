@@ -51,10 +51,10 @@ services:
         ## à refaire une fois connecté sur la vm linux pour faciliter une jonction commune
     environment:
       - PMA_ARBITRARY=1
-      - PMA_HOST: {{ DB_HOST }}
-      - PMA_USER: {{ DB_USER }}
-      - PMA_PASSWORD: {{ MYSQL_PASSWORD }}
-      - PMA_PORT: {{ MYSQL_PORT }}
+      - "PMA_HOST={{ DB_HOST }}"
+      - "PMA_USER={{ DB_USER }}"
+      - "PMA_PASSWORD={{ MYSQL_PASSWORD }}"
+      - "PMA_PORT={{ MYSQL_PORT }}"
 
 volumes:
   bdd_data:
