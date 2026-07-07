@@ -8,7 +8,7 @@
   tags: always
 
 ## Log into a Docker registry
-- name: Connexion to private registry
+- name: Connection to private registry
   community.docker.docker_login:
     registry_url: https://index.docker.io/v1/
     username: "{{ lookup('ansible.builtin.env', 'REGISTRY_USER') }}"
@@ -19,23 +19,23 @@
   ansible.builtin.file:
     path: "{{ working_path }}"
     state: directory
-    owner: "{{user_owner}}"
-    group: "{{user_group}}"
+    owner: "{{ user_owner }}"
+    group: "{{ user_group }}"
     mode: '0755'
 
 - name: Generate docker-compose file
   ansible.builtin.template:
     src: docker-compose.yml.j2
     dest: "{{ working_path }}/docker-compose.yml"
-    owner: "{{user_owner}}"
-    group: "{{user_group}}"
+    owner: "{{ user_owner }}"
+    group: "{{ user_group }}"
 
 - name: set up templates .env.app
   ansible.builtin.template:
     src: env.app.j2
     dest: "{{ working_path }}/.env.app"  ## still in progress
-    owner: "{{user_owner}}"
-    group: "{{user_group}}"
+    owner: "{{ user_owner }}"
+    group: "{{ user_group }}"
     mode: '0600'
 
 
@@ -43,8 +43,8 @@
   ansible.builtin.template:
     src: env.db.j2
     dest: "{{ working_path }}/.env.db"  ## still in progress
-    owner: "{{user_owner}}"
-    group: "{{user_group}}"
+    owner: "{{ user_owner }}"
+    group: "{{ user_group }}"
     mode: '0600'
 
 
