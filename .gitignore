@@ -1,0 +1,10 @@
+# Fichiers à ignorer
+.env*
+_pycache_/
+*.pyc
+.vscode/
+.idea/
+
+# Exception
+
+!.env.exemple

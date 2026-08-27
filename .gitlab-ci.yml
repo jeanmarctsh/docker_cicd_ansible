@@ -1,0 +1,84 @@
+stages:
+  - test
+  - build
+  - scan
+  - deploy
+
+variables:
+  IMAGE_NAME: "docker.io/${REGISTRY_USER}/app2"
+  STORAGE_DRIVER: "vfs"
+  BUILDAH_ISOLATION: "chroot"
+  BUILDAH_FORMAT: "docker"
+  # Tag will be fetch automatically once create, even for a simple update(first thing to do once everything ok)
+  IMAGE_TAG: $CI_COMMIT_TAG
+
+# Environment and File Checking
+test_stage:
+  stage: test
+  image: python:3.13-slim
+  script:
+      # Upgrade pip package manager
+    - pip install --no-cache-dir --upgrade pip
+      # Install project dependencies
+    - pip install --no-cache-dir streamlit pillow pandas mysql-connector-python
+      # syntax checking with "py_compile"
+    - python -m py_compile ./Hotel-Management-using-SQL-main/app/Main_Page.py 
+    
+
+# Steps required to create and push image to private registry
+build_stage:
+  stage: build 
+  needs: ["test_stage"]
+  # fixed image for more control during the whole process
+  image: quay.io/buildah/stable:v1.43.1-immutable
+  rules:
+    - if: $CI_COMMIT_TAG && $CI_COMMIT_REF_PROTECTED == "true"
+      when: on_success
+  
+  before_script:
+      # login to private registry
+    - buildah login -u "${REGISTRY_USER}" -p "${REGISTRY_TOKEN_HUB}" docker.io
+  script:
+      # Create an image
+    - buildah bud -t "${IMAGE_NAME}:${IMAGE_TAG}" .
+      # Pushing image to the private registry
+    - buildah push "${IMAGE_NAME}:${IMAGE_TAG}"
+      # list images 
+  after_script:
+    - buildah images
+
+
+# Scan the built image with Trivy
+scan_stage:
+  stage: scan
+  needs: ["build_stage"]
+  image: 
+    name: aquasec/trivy:0.72.0          
+    entrypoint: [""]  
+  
+  before_script:
+
+    - trivy image --format json --output image-scan-report.json "docker.io/${IMAGE_NAME}:${IMAGE_TAG}"
+
+    # login to private registry
+    - trivy registry login -u "${REGISTRY_USER}" -p "${REGISTRY_TOKEN_HUB}" docker.io
+
+  script:
+    # Scan the built image with Trivy (Fails code 1 only on CRITICAL vulnerabilities)
+    - trivy image --exit-code 1 --severity CRITICAL "docker.io/${IMAGE_NAME}:${IMAGE_TAG}"
+  
+  artifacts:
+    name:   "result-${IMAGE_TAG}"
+    when: always                        
+    paths:
+      - image-scan-report.json
+    expire_in: 1 week
+
+
+
+# Steps required to pull image from private repository and deploy app on workers nodes with ansible
+deploy_stage:
+  stage: deploy
+
+
+## Work in progress

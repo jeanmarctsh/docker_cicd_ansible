@@ -1,0 +1,5 @@
+---
+# vars file for deploy_app
+deploy_app_name: streamlit
+deploy_app_port: value here
+phpmyadmin_port: value here

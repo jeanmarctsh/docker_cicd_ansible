@@ -1,0 +1,11 @@
+# Key elements to execute ansble playbook (file to execute on CICD). 
+
+---
+- name: app deployment
+  hosts: workers
+  gather_facts: no
+  become: true 
+
+  roles:
+    - deploy_app
+
